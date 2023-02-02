@@ -1,36 +1,11 @@
-
-# A very simple Flask Hello World app for you to get started with...
-
-from flask import Flask, render_template, request, url_for
-from flash_sqlalchemy import SQLAlchemy
+from flask import Flask, request, Response
 
 app = Flask(__name__)
-app.config{"DEBUG"} = True
+app.config["DEBUG"] = True
 
-@app.route('/', methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        messages.append(request.form)
-
-class Message(db.Model):
-
-    __tablename__ = "messages"
-
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(4096))
-
-
-messages = []
-
-SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
-    username="lake0",
-    password="wowadatabase:)",
-    hostname="lake0.mysql.pythonanywhere-services.com",
-    databasename="lake0$messages",
-)
-app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
-app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-db = SQLAlchemy(app)
-
+@app.route('/foo', methods=["POST"])
+def foo_page():
+    req_data = request.get_json()
+    message = req_data['message']
+    print(message)
+    return Response(status=200)
