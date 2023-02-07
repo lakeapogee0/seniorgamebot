@@ -1,26 +1,36 @@
 id = "abcdefg"
 print(id)
 from flask import Flask, request
+import requests
+import json
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 app = Flask(__name__)
 
-if __name__ == '__main__':
-    app.debug = True
-    app.run()
+#if __name__ == '__main__':
+    #app.debug = True
+    #app.run()
 
 
 # GET requests will be blocked
-@app.route('/json-example', methods=['POST'])
-def json_example():
+@app.route('/foo', methods=['POST'])
+def foo():
     request_data = request.get_json()
 
-    language = request_data['name']
-    framework = request_data['text']
+    if request_data["name"] == "test":
+        pass
+    elif "❌💀" in request_data["text"]:
+        r = requests.post("https://api.groupme.com/v3/bots/post", json ={
+          "bot_id"  : "81110e5203f6018341de37d901",
+          "text"    : request_data["name"] + " was assassinated\nRIP 💀"
+        })
+    else:
+        r = requests.post("https://api.groupme.com/v3/bots/post", json ={
+          "bot_id"  : "81110e5203f6018341de37d901",
+            "text"    : request_data["text"]
+        })
 
-
-    boolean_test = request_data['user_id']
-
-    return '''
-           The language value is: {}
-           The framework value is: {}
-           The boolean value is: {}'''.format(language, framework, boolean_test)
+        print(r.text)
