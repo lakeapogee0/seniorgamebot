@@ -18,7 +18,6 @@ app = Flask(__name__)
 def foo():
     load_dotenv()
     botId = os.getenv('BOT_ID')
-    print("this is id" + botId)
     request_data = request.get_json()
     if request_data["name"] == "test":
         pass
