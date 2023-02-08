@@ -34,6 +34,13 @@ def getId():
     botId = os.getenv('BOT_ID')
     return botId
 
+#from tutorial - modified for my code of course
+class Stat(db.Model):
+
+    __tablename__ = "stat"
+
+    id = db.Column(db.Integer, primary_key=True)
+    stat = db.Column(db.String(4096))
 stat = "no one is out of the game"
 # GET requests will be blocked
 @app.route('/foo', methods=['POST'])
