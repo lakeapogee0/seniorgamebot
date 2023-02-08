@@ -6,14 +6,6 @@ import json
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-
-botId = os.getenv('BOT_ID')
-print(botId)
-
-
-
-
 app = Flask(__name__)
 
 #if __name__ == '__main__':
@@ -24,10 +16,10 @@ app = Flask(__name__)
 # GET requests will be blocked
 @app.route('/foo', methods=['POST'])
 def foo():
-    request_data = request.get_json()
     load_dotenv()
-    botId =  os.getenv('BOT_ID')
-    print(botId)
+    botId = os.getenv('BOT_ID')
+    print("this is id" + botId)
+    request_data = request.get_json()
     if request_data["name"] == "test":
         pass
     elif "❌💀" in request_data["text"]:
