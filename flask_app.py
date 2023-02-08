@@ -1,6 +1,6 @@
 id = "abcdefg"
 print(id)
-from flask import Flask, request
+from flask import Flask, request, render_template
 import requests
 import json
 import os
@@ -8,10 +8,14 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 
-#if __name__ == '__main__':
-    #app.debug = True
-    #app.run()
+if __name__ == '__main__':
+    app.debug = True
+    app.run()
 
+
+@app.route('/', methods=['GET'])
+def index():
+       return render_template("index.html")
 
 # GET requests will be blocked
 @app.route('/foo', methods=['POST'])
@@ -33,3 +37,7 @@ def foo():
         })
 
         print(r.text)
+
+
+
+
