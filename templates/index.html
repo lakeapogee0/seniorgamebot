@@ -2,8 +2,12 @@
 <html>
     <body>
       <h1>testing the index homepage</h1>
-      <div>
-          {{stat}}
+      <div class="container">
+          {% for stat in stats %}
+          <div class="row">
+              {{stat.content}}
+          </div>
+          {% endfor %}
       </div>
        <br>
        <br>

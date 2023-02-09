@@ -37,21 +37,23 @@ def getId():
 #from tutorial - modified for my code of course
 class Stat(db.Model):
 
-    __tablename__ = "stat"
+    __tablename__ = "stats"
 
     id = db.Column(db.Integer, primary_key=True)
     stat = db.Column(db.String(4096))
-stat = "no one is out of the game"
+#stat = "no one is out of the game"
 # GET requests will be blocked
+
+request_data = ""
 @app.route('/foo', methods=['POST'])
 def foo():
     botId = getId()
     request_data = request.get_json()
+    session['request_data'] = request_data
     if request_data["name"] == "test":
         pass
     elif "❌💀" in request_data["text"]:
-        global stat
-        stat = request_data["name"] + " is out of the game!💀"
+
         r = requests.post("https://api.groupme.com/v3/bots/post", json ={
           "bot_id"  : botId,
           "text"    : request_data["name"] + " was assassinated\nRIP 💀"
@@ -66,7 +68,11 @@ def foo():
 
 @app.route('/', methods=['GET'])
 def index():
-       return render_template("index.html", stat=stat)
+    return render_template("index.html", stat=Stat.query.all())
+    statText = session['request_data']["name"] + " is out of the game!💀"
+    stat = Stat(content=statText)
+    db.session.add(stat)
+    db.session.commit()
 
 
 
