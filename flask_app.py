@@ -1,6 +1,6 @@
 id = "abcdefg"
 print(id)
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, Response
 from flask_sqlalchemy import SQLAlchemy
 import requests
 import json
@@ -28,32 +28,42 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 #creates an object for the database using above config
 db = SQLAlchemy(app)
 
+#from tutorial - modified for my code of course
+#asked chatGPT how to set this up as tutorials had different answers w/o explanation
+class Stat(db.Model):
+
+    __tablename__ = "StatData"
+    id = db.Column(db.Integer, primary_key=True)
+    statRip = db.Column(db.String(4096))
+
+def __init__(self, statRip):
+    self.statRip = statRip
+
+db.create_all()
+
 
 def getId():
     load_dotenv()
     botId = os.getenv('BOT_ID')
     return botId
 
-#from tutorial - modified for my code of course
-class Stat(db.Model):
-
-    __tablename__ = "stats"
-
-    id = db.Column(db.Integer, primary_key=True)
-    stat = db.Column(db.String(4096))
-#stat = "no one is out of the game"
-# GET requests will be blocked
 
 request_data = ""
+# GET requests will be blocked
 @app.route('/foo', methods=['POST'])
 def foo():
     botId = getId()
+    global request_data
     request_data = request.get_json()
-    session['request_data'] = request_data
     if request_data["name"] == "test":
         pass
     elif "❌💀" in request_data["text"]:
-
+        #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
+        global statRip
+        stat = Stat(statRip=request_data["name"] + " is out of the game!")
+        print("testing the SQL" + request_data["name"] + " is out of the game!💀")
+        db.session.add(stat)
+        db.session.commit()
         r = requests.post("https://api.groupme.com/v3/bots/post", json ={
           "bot_id"  : botId,
           "text"    : request_data["name"] + " was assassinated\nRIP 💀"
@@ -65,14 +75,12 @@ def foo():
         })
 
         print(r.text)
+    return Response(status=200)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template("index.html", stat=Stat.query.all())
-    statText = session['request_data']["name"] + " is out of the game!💀"
-    stat = Stat(content=statText)
-    db.session.add(stat)
-    db.session.commit()
+    return render_template("index.html", data=Stat.query.all())
+
 
 
 

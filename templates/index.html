@@ -2,15 +2,23 @@
 <html>
     <body>
       <h1>testing the index homepage</h1>
-      <div class="container">
-          {% for stat in stats %}
-          <div class="row">
-              {{stat.content}}
-          </div>
+      <img src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/shushing-face.png" alt="roblox">
+      <table>
+          <tr>
+              <th>
+                  Assassinations:
+              </th>
+          </tr>
+          {% for item in data %}
+          <tr>
+              <td>
+                  {{item.statRip}}
+              </td>
+          </tr>
           {% endfor %}
-      </div>
+      </table>
        <br>
        <br>
-       <img src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/shushing-face.png" alt="roblox">
+
     </body>
 </html>
