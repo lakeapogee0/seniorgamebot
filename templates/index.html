@@ -6,13 +6,26 @@
       <table>
           <tr>
               <th>
-                  Assassinations:
+                  Murdered:
               </th>
           </tr>
           {% for item in data %}
           <tr>
               <td>
-                  {{item.statRip}}
+                  {{item.murdered if item.murdered else ''}}
+              </td>
+          </tr>
+          {% endfor %}
+          </tr>
+          <tr>
+              <th>
+                  Witnessed:
+              </th>
+          </tr>
+          {% for item in data %}
+          <tr>
+              <td>
+                  {{item.witnessed if item.witnessed else ''}}
               </td>
           </tr>
           {% endfor %}
