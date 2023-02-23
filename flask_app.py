@@ -37,14 +37,6 @@ with db.session() as session:
         print(row)
 
 
-#mycursor = db.cursor()
-
-#mycursor.execute("SELECT * FROM deathTable")
-
-#myresult = mycursor.fetchall()
-
-#for x in myresult:
-#  print(x)
 #https://stackoverflow.com/questions/30785892/simple-select-statement-on-existing-table-with-sqlalchemy
 
 
