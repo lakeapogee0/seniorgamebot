@@ -179,7 +179,7 @@ def foo():
     global gameState_value
     gameState_value = db.session.query(GameState.gameState).order_by(GameState.id.desc()).limit(1).scalar()
     print(gameState_value)
-    if request_data["name"] == "test":
+    if request_data["user_id"] == "876269":
             pass
     elif request_data["text"] == "/help":
         r = requests.post(callbackUrl, json ={
@@ -188,9 +188,7 @@ def foo():
             })
     elif request_data["text"] == "/stats":
 
-        count_alive = db.session.query(func.count(Assassin.id)).filter(Assassin.murdered == False, Assassin.witnessed == False, Assassin.timedout == False).scalar()
-        count_alive = str(tuple([count_alive]))
-
+        count_alive = str(db.session.query(func.count(Assassin.id)).filter(Assassin.murdered == False, Assassin.witnessed == False, Assassin.timedout == False).scalar())
 
         print(count_alive)
 
