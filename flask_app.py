@@ -2,7 +2,7 @@ id = "abcdefg"
 print(id)
 from flask import Flask, request, render_template, Response
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import select, MetaData, Table, UniqueConstraint, Index #this isn't working -- it should allow unique checking between 2 columns in SQL
+from sqlalchemy import Boolean, select, MetaData, Table, UniqueConstraint, Index #this isn't working -- it should allow unique checking between 2 columns in SQL
 from sqlalchemy.exc import IntegrityError #chatGPT showed me error handling
 import mysql.connector
 import requests
@@ -44,17 +44,42 @@ with db.session() as session:
 #asked chatGPT how to set this up as tutorials had different answers w/o explanation
 class Assassin(db.Model):
 
-    __tablename__ = "deathTable"
+    __tablename__ = "DeathTable"
     __table_args__ = (
         db.UniqueConstraint('murdered', 'witnessed'),)
         #UniqueConstraint('murdered', 'witnessed', name='unique_death'),
         #)#unique_death is just the name of the constraint which will be made in SQL (it just needs to call it something)
     id = db.Column(db.Integer, primary_key=True)
-    gameState = db.Column(db.Integer)
     name = db.Column(db.String(255), unique=True)
     murdered = db.Column(db.Boolean, unique=True)
     witnessed = db.Column(db.Boolean, unique=True)
     timedout = db.Column(db.Boolean, unique = True)
+
+    def set_murdered(self, value):
+        if value:
+            self.witnessed = False
+            self.timedout = False
+        self.murdered = value
+
+    def set_witnessed(self, value):
+        if value:
+            self.murdered = False
+            self.timedout = False
+        self.witnessed = value
+
+    def set_timedout(self, value):
+        if value:
+            self.murdered = False
+            self.witnessed = False
+        self.timedout = value
+
+class GameState(db.Model):
+
+    __tablename__ = "GameState"
+    id = db.Column(db.Integer, primary_key=True)
+    gameState = db.Column(db.Integer)
+
+
 
 
 #Index('unique_death', Assassin.murdered, Assassin.witnessed, unique=True)
@@ -67,6 +92,7 @@ def __init__(self, name, murdered, witnessed, timedout, gameState):
     self.gameState = gameState
 #creates MySQL table
 db.create_all()
+
 
 #this is my function that allows me to easily grab the bot ID from .env. Seems to work better than a global var, but atm I have to either:
 #use getId() wherever I need the ID (so run the function every time), or say botId = getId inside every function. Maybe a global var is the right move since the botId doesn't change.
@@ -93,7 +119,7 @@ def foo():
     request_data = request.get_json()
     if request_data["name"] == "Jib":
         if request_data["text"] == "///start":
-            game = Assassin(gameState=1)
+            game = GameState(gameState=1)
             #print("testing the SQL" + request_data["name"] + " is out of the game!💀")
             try:
                 db.session.add(game)
@@ -109,13 +135,33 @@ def foo():
               "text"    : "ok say ✅ to join"
               })
         elif request_data["text"] == "///everyonein":
-            gameState = 2
+            game = GameState(gameState=2)
+            #print("testing the SQL" + request_data["name"] + " is out of the game!💀")
+            try:
+                db.session.add(game)
+                db.session.commit()
+            except IntegrityError as e:
+                db.session.rollback()
+                # Handle the unique error
+                # for example, you can show an error message to the user:
+                print('gameState - ERROR: Either was same, or NULL')
+                print(e)
             r = requests.post(callbackUrl, json ={
               "bot_id"  : botId,
               "text"    : "ok, game starting!🤫"
               })
         elif request_data["text"] == "///end":
-            gameState = 0
+            game = GameState(gameState=0)
+            #print("testing the SQL" + request_data["name"] + " is out of the game!💀")
+            try:
+                db.session.add(game)
+                db.session.commit()
+            except IntegrityError as e:
+                db.session.rollback()
+                # Handle the unique error
+                # for example, you can show an error message to the user:
+                print('gameState - ERROR: Either was same, or NULL')
+                print(e)
             r = requests.post(callbackUrl, json ={
               "bot_id"  : botId,
               "text"    : "game ended"
@@ -123,14 +169,15 @@ def foo():
         else:
             pass
     #if the name of the person who sent the message is test, don't respond (that's the bot's name). I will later change this to user_id so it's unique and can't mix up multiple people with the same name.
-    results = db.engine.execute('SELECT gameState FROM deathTable')
+    #results = db.engine.execute('SELECT gameState FROM deathTable')
 
-    # iterate over the results and print the gameState value for each row
-    for row in results:
-        print(row.gameState)
+    #chatGPT gave me this line
+    global gameState_value
+    gameState_value = db.session.query(GameState.gameState).order_by(GameState.id.desc()).limit(1).scalar()
+    print(gameState_value)
     if request_data["name"] == "test":
             pass
-    elif gameState == 1 :
+    elif gameState_value == 1 :
         if "✅" in request_data["text"]:
             #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
             joinName = Assassin(name=request_data["name"], murdered=False, witnessed=False, timedout=False)
@@ -147,16 +194,16 @@ def foo():
             #r sends a POST back to GroupMe so bot can talk in chat.
             r = requests.post(callbackUrl, json ={
               "bot_id"  : botId,
-              "text"    : request_data["name"] + "joined the game"
+              "text"    : request_data["name"] + " joined the game"
             })
-    elif gameState == 2:
+    elif gameState_value == 2:
         #else if ❌💀 in chat, send to the database that someone is out, and respond with a RIP message
         if "❌💀" in request_data["text"]:
             #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
-            death = Assassin(murdered=request_data["name"])
-            #print("testing the SQL" + request_data["name"] + " is out of the game!💀")
+            assassin = Assassin.query.filter_by(name=request_data["name"]).first()
+            # Update the timedout attribute
+            assassin.murdered = True
             try:
-                db.session.add(death)
                 db.session.commit()
             except IntegrityError as e:
                 db.session.rollback()
@@ -170,11 +217,13 @@ def foo():
               "text"    : request_data["name"] + " was assassinated\nRIP 💀"
             })
         elif "❌👀" in request_data["text"]:
-            #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
-            death = Assassin(witnessed=request_data["name"])
+            #ChatGPT made this code to change the value rather than add a new one!
+            # Retrieve the assassin instance from the database using the name
+            assassin = Assassin.query.filter_by(name=request_data["name"]).first()
+            # Update the witnessed attribute
+            assassin.witnessed = True
             #print("testing the SQL" + request_data["name"] + " is out of the game!💀")
             try:
-                db.session.add(death)
                 db.session.commit()
             except IntegrityError as e:
                 db.session.rollback()
@@ -185,9 +234,27 @@ def foo():
             #r sends a POST back to GroupMe so bot can talk in chat.
             r = requests.post(callbackUrl, json ={
               "bot_id"  : botId,
-              "text"    : request_data["name"] + " was witnessed\nRIP 💀"
+              "text"    : request_data["name"] + " was witnessed\nRIP 👀"
             })
-    elif gameState == 0:
+        elif "❌⌛" in request_data["text"] or "❌⏳" in request_data["text"]:
+            #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
+            assassin = Assassin.query.filter_by(name=request_data["name"]).first()
+            # Update the timedout attribute
+            assassin.timedout = True
+            try:
+                db.session.commit()
+            except IntegrityError as e:
+                db.session.rollback()
+                # Handle the unique error
+                # for example, you can show an error message to the user:
+                print('witnessed - ERROR: Either name was same, or NULL')
+                print(e)
+            #r sends a POST back to GroupMe so bot can talk in chat.
+            r = requests.post(callbackUrl, json ={
+              "bot_id"  : botId,
+              "text"    : request_data["name"] + " timed out\nRIP ⏳"
+            })
+    elif gameState_value == 0:
         r = requests.post("https://api.groupme.com/v3/bots/post", json ={
           "bot_id"  : botId,
           "text"    : "the game is not currently active"
