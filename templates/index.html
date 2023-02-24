@@ -1,75 +1,97 @@
 <!DOCTYPE html>
 <html>
     <body>
-      <h1>homework assignment bot</h1>
-      <img src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/shushing-face.png" alt="shushface" style="width: 2in">
-      <!-- chatGPT made this table-->
-        <table>
-          <tr>
-            <th style="padding-right: 1in">Alive👤</th>
-            <th style="padding-right: 1in">Murdered💀</th>
-            <th style="padding-right: 1in">Witnessed👀</th>
-            <th style="padding-right: 1in">Timed Out⌛</th>
-          </tr>
-          <tr>
-    <td style="padding-right: 1in">
-          {% set none_list = [] %}
-          {% for assassin in data %}
-            {% if not assassin.murdered and not assassin.witnessed and not assassin.timedout %}
-              {% set _ = none_list.append(assassin.name) %}
-            {% endif %}
-          {% endfor %}
-          {% set none_count = none_list|count %}
-          Count: {{ none_count }}
-          <br>
-          {% for name in none_list %}
-            {{ name }}<br>
-          {% endfor %}
-        </td>
-        <td style="padding-right: 1in">
-          {% set murdered_list = [] %}
-          {% for assassin in data %}
-            {% if assassin.murdered %}
-              {% set _ = murdered_list.append(assassin.name) %}
-            {% endif %}
-          {% endfor %}
-          {% set murdered_count = murdered_list|count %}
-          Count: {{ murdered_count }}
-          <br>
-          {% for name in murdered_list %}
-            {{ name }}<br>
-          {% endfor %}
-        </td>
-        <td style="padding-right: 1in">
-          {% set witnessed_list = [] %}
-          {% for assassin in data %}
-            {% if assassin.witnessed %}
-              {% set _ = witnessed_list.append(assassin.name) %}
-            {% endif %}
-          {% endfor %}
-          {% set witnessed_count = witnessed_list|count %}
-          Count: {{ witnessed_count }}
-          <br>
-          {% for name in witnessed_list %}
-            {{ name }}<br>
-          {% endfor %}
-        </td>
-        <td style="padding-right: 1in">
-          {% set timedout_list = [] %}
-          {% for assassin in data %}
-            {% if assassin.timedout %}
-              {% set _ = timedout_list.append(assassin.name) %}
-            {% endif %}
-          {% endfor %}
-          {% set timedout_count = timedout_list|count %}
-          Count: {{ timedout_count }}
-          <br>
-          {% for name in timedout_list %}
-            {{ name }}<br>
-          {% endfor %}
-        </td>
-        </tr>
-     </table>
+        <head>
+        <title>homework assignment bot</title>
+        <img src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/shushing-face.png" alt="shushface" style="width: 2in">
+        <h3>refresh to update</h3>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            </head>
+            <body>
+                <table id="assassin-table">
+                    <!-- chatGPT made this table-->
+                    <table>
+                      <tr>
+                        <th style="padding-right: 1in">Alive👤</th>
+                        <th style="padding-right: 1in">Murdered💀</th>
+                        <th style="padding-right: 1in">Witnessed👀</th>
+                        <th style="padding-right: 1in">Timed Out⌛</th>
+                      </tr>
+                      <tr>
+                    <td style="padding-right: 1in">
+                      {% set none_list = [] %}
+                      {% for assassin in data %}
+                        {% if not assassin.murdered and not assassin.witnessed and not assassin.timedout %}
+                          {% set _ = none_list.append(assassin.name) %}
+                        {% endif %}
+                      {% endfor %}
+                      {% set none_count = none_list|count %}
+                      Count: {{ none_count }}
+                      <br>
+                      {% for name in none_list %}
+                        {{ name }}<br>
+                      {% endfor %}
+                    </td>
+                    <td style="padding-right: 1in">
+                      {% set murdered_list = [] %}
+                      {% for assassin in data %}
+                        {% if assassin.murdered %}
+                          {% set _ = murdered_list.append(assassin.name) %}
+                        {% endif %}
+                      {% endfor %}
+                      {% set murdered_count = murdered_list|count %}
+                      Count: {{ murdered_count }}
+                      <br>
+                      {% for name in murdered_list %}
+                        {{ name }}<br>
+                      {% endfor %}
+                    </td>
+                    <td style="padding-right: 1in">
+                      {% set witnessed_list = [] %}
+                      {% for assassin in data %}
+                        {% if assassin.witnessed %}
+                          {% set _ = witnessed_list.append(assassin.name) %}
+                        {% endif %}
+                      {% endfor %}
+                      {% set witnessed_count = witnessed_list|count %}
+                      Count: {{ witnessed_count }}
+                      <br>
+                      {% for name in witnessed_list %}
+                        {{ name }}<br>
+                      {% endfor %}
+                    </td>
+                    <td style="padding-right: 1in">
+                      {% set timedout_list = [] %}
+                      {% for assassin in data %}
+                        {% if assassin.timedout %}
+                          {% set _ = timedout_list.append(assassin.name) %}
+                        {% endif %}
+                      {% endfor %}
+                      {% set timedout_count = timedout_list|count %}
+                      Count: {{ timedout_count }}
+                      <br>
+                      {% for name in timedout_list %}
+                        {{ name }}<br>
+                      {% endfor %}
+                    </td>
+                    </tr>
+                 </table>
+                </table>
+                <!--<button id="update-button">Update</button>-->
+                <script>
+                    $(document).ready(function() {
+                        $("#update-button").click(function() {
+                            $.ajax({
+                                url: "/update_table",
+                                type: "GET",
+                                success: function(data) {
+                                    $("#assassin-table").html(data);
+                                }
+                            });
+                        });
+                    });
+                </script>
+
 
 
 

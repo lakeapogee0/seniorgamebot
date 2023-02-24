@@ -2,7 +2,7 @@ id = "abcdefg"
 print(id)
 from flask import Flask, request, render_template, Response
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Boolean, select, MetaData, Table, UniqueConstraint, Index #this isn't working -- it should allow unique checking between 2 columns in SQL
+from sqlalchemy import func, case, Boolean, select, MetaData, Table, UniqueConstraint, Index #this isn't working -- it should allow unique checking between 2 columns in SQL
 from sqlalchemy.exc import IntegrityError #chatGPT showed me error handling
 import mysql.connector
 import requests
@@ -109,19 +109,6 @@ callbackUrl = "https://api.groupme.com/v3/bots/post"
 
 
 
-
-#game = GameState(gameState=0)
-#try:
-#    db.session.add(game)
- #   db.session.commit()
-#except IntegrityError as e:
- #   db.session.rollback()
-    # Handle the unique error
-    # for example, you can show an error message to the user:
-  #  print('gameState - ERROR: Either was same, or NULL')
-   # print(e)
-
-
 # GET requests will be blocked
 @app.route('/foo', methods=['POST'])
 def foo():
@@ -133,7 +120,8 @@ def foo():
     global murdered
     global witnessed
     request_data = request.get_json()
-    if request_data["name"] == "Jib":
+    print(request_data)
+    if request_data["user_id"] == "105555664":
         if request_data["text"] == "///start":
             game = GameState(gameState=1)
             #print("testing the SQL" + request_data["name"] + " is out of the game!💀")
@@ -193,6 +181,33 @@ def foo():
     print(gameState_value)
     if request_data["name"] == "test":
             pass
+    elif request_data["text"] == "/help":
+        r = requests.post(callbackUrl, json ={
+              "bot_id"  : botId,
+              "text"    : "hi " + request_data["name"] + ". Say ❌💀 if assassinated, say ❌👀 if witnessed, say  ❌⌛ (either hourglass emoji) if timed out"
+            })
+    elif request_data["text"] == "/stats":
+
+        count_alive = db.session.query(func.count(Assassin.id)).filter(Assassin.murdered == False, Assassin.witnessed == False, Assassin.timedout == False).scalar()
+        count_alive = str(tuple([count_alive]))
+
+
+        print(count_alive)
+
+        # Count the number of True values in the 'murdered' column
+        murdered_count = str(db.session.query(func.sum(db.cast(Assassin.murdered, db.Integer))).scalar())
+
+        # Count the number of True values in the 'witnessed' column
+        witnessed_count = str(db.session.query(func.sum(db.cast(Assassin.witnessed, db.Integer))).scalar())
+
+        # Count the number of True values in the 'timedout' column
+        timedout_count = str(db.session.query(func.sum(db.cast(Assassin.timedout, db.Integer))).scalar())
+
+        r = requests.post(callbackUrl, json ={
+              "bot_id"  : botId,
+              "text"    : request_data["name"] + ", here are the stats:\n Alive: " + count_alive + "\nMurdered: " + murdered_count + "\nWitnessed: " + witnessed_count + "\nTimed Out: " + timedout_count
+            })
+
     elif gameState_value == 1 :
         if "✅" in request_data["text"]:
             #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
@@ -283,6 +298,13 @@ def foo():
 def index():
     return render_template("index.html", data=Assassin.query.all())
 
+
+@app.route("/update_table")
+def update_table():
+    return render_template("assassin_table.html", data=Assassin.query.all())
+
+if __name__ == "__main__":
+    app.run()
 
 
 
