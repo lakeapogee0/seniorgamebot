@@ -4,13 +4,25 @@
       <h1>testing the index homepage</h1>
       <img src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/shushing-face.png" alt="roblox">
       <!-- chatGPT made this table-->
-      <table>
+    <table>
       <tr>
+        <th>Alive👤</th>
         <th>Murdered💀</th>
         <th>Witnessed👀</th>
         <th>Timed Out⌛</th>
       </tr>
       <tr>
+        <td>
+          {% set none_list = [] %}
+          {% for assassin in data %}
+            {% if not assassin.murdered and not assassin.witnessed and not assassin.timedout %}
+              {% set _ = none_list.append(assassin.name) %}
+            {% endif %}
+          {% endfor %}
+          {{ none_list|join(", ") }}
+          <br>
+          Count: {{ none_list|count }}
+        </td>
         <td>
           {% set murdered_list = [] %}
           {% for assassin in data %}
@@ -46,6 +58,7 @@
         </td>
       </tr>
     </table>
+
 
        <br>
        <br>

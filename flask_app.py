@@ -106,6 +106,22 @@ def getId():
 request_data = ""
 gameState = None
 callbackUrl = "https://api.groupme.com/v3/bots/post"
+
+
+
+
+game = GameState(gameState=0)
+try:
+    db.session.add(game)
+    db.session.commit()
+except IntegrityError as e:
+    db.session.rollback()
+    # Handle the unique error
+    # for example, you can show an error message to the user:
+    print('gameState - ERROR: Either was same, or NULL')
+    print(e)
+
+
 # GET requests will be blocked
 @app.route('/foo', methods=['POST'])
 def foo():
@@ -202,7 +218,7 @@ def foo():
             #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
             assassin = Assassin.query.filter_by(name=request_data["name"]).first()
             # Update the timedout attribute
-            assassin.murdered = True
+            assassin.set_murdered(True)
             try:
                 db.session.commit()
             except IntegrityError as e:
@@ -221,7 +237,7 @@ def foo():
             # Retrieve the assassin instance from the database using the name
             assassin = Assassin.query.filter_by(name=request_data["name"]).first()
             # Update the witnessed attribute
-            assassin.witnessed = True
+            assassin.set_witnessed(True)
             #print("testing the SQL" + request_data["name"] + " is out of the game!💀")
             try:
                 db.session.commit()
@@ -240,7 +256,7 @@ def foo():
             #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
             assassin = Assassin.query.filter_by(name=request_data["name"]).first()
             # Update the timedout attribute
-            assassin.timedout = True
+            assassin.set_timedout(True)
             try:
                 db.session.commit()
             except IntegrityError as e:
