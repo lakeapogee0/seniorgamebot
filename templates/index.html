@@ -4,61 +4,64 @@
       <h1>testing the index homepage</h1>
       <img src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/shushing-face.png" alt="roblox">
       <!-- chatGPT made this table-->
-    <table>
-      <tr>
-        <th>Alive👤</th>
-        <th>Murdered💀</th>
-        <th>Witnessed👀</th>
-        <th>Timed Out⌛</th>
-      </tr>
-      <tr>
-        <td>
-          {% set none_list = [] %}
-          {% for assassin in data %}
-            {% if not assassin.murdered and not assassin.witnessed and not assassin.timedout %}
-              {% set _ = none_list.append(assassin.name) %}
-            {% endif %}
-          {% endfor %}
-          {{ none_list|join(", ") }}
-          <br>
-          Count: {{ none_list|count }}
-        </td>
-        <td>
-          {% set murdered_list = [] %}
-          {% for assassin in data %}
-            {% if assassin.murdered %}
-              {% set _ = murdered_list.append(assassin.name) %}
-            {% endif %}
-          {% endfor %}
-          {{ murdered_list|join(", ") }}
-          <br>
-          Count: {{ murdered_list|count }}
-        </td>
-        <td>
-          {% set witnessed_list = [] %}
-          {% for assassin in data %}
-            {% if assassin.witnessed %}
-              {% set _ = witnessed_list.append(assassin.name) %}
-            {% endif %}
-          {% endfor %}
-          {{ witnessed_list|join(", ") }}
-          <br>
-          Count: {{ witnessed_list|count }}
-        </td>
-        <td>
-          {% set timedout_list = [] %}
-          {% for assassin in data %}
-            {% if assassin.timedout %}
-              {% set _ = timedout_list.append(assassin.name) %}
-            {% endif %}
-          {% endfor %}
-          {{ timedout_list|join(", ") }}
-          <br>
-          Count: {{ timedout_list|count }}
-        </td>
-      </tr>
-    </table>
-
+        <table>
+          <tr>
+            <th style="padding-right: 1in">Alive👤</th>
+            <th style="padding-right: 1in">Murdered💀</th>
+            <th style="padding-right: 1in">Witnessed👀</th>
+            <th style="padding-right: 1in">Timed Out⌛</th>
+          </tr>
+          <tr>
+            <td style="padding-right: 1in">
+              {% set none_list = [] %}
+              {% for assassin in data %}
+                {% if not assassin.murdered and not assassin.witnessed and not assassin.timedout %}
+                  {% set _ = none_list.append(assassin.name) %}
+                {% endif %}
+              {% endfor %}
+              {% for item in none_list %}
+                {{ item }}<br>
+              {% endfor %}
+              Count: {{ none_list|count }}
+            </td>
+            <td style="padding-right: 1in">
+              {% set murdered_list = [] %}
+              {% for assassin in data %}
+                {% if assassin.murdered %}
+                  {% set _ = murdered_list.append(assassin.name) %}
+                {% endif %}
+              {% endfor %}
+              {% for item in murdered_list %}
+                {{ item }}<br>
+              {% endfor %}
+              Count: {{ murdered_list|count }}
+            </td>
+            <td style="padding-right: 1in">
+              {% set witnessed_list = [] %}
+              {% for assassin in data %}
+                {% if assassin.witnessed %}
+                  {% set _ = witnessed_list.append(assassin.name) %}
+                {% endif %}
+              {% endfor %}
+              {% for item in witnessed_list %}
+                {{ item }}<br>
+              {% endfor %}
+              Count: {{ witnessed_list|count }}
+            </td>
+            <td style="padding-right: 1in">
+              {% set timedout_list = [] %}
+              {% for assassin in data %}
+                {% if assassin.timedout %}
+                  {% set _ = timedout_list.append(assassin.name) %}
+                {% endif %}
+              {% endfor %}
+              {% for item in timedout_list %}
+                {{ item }}<br>
+              {% endfor %}
+              Count: {{ timedout_list|count }}
+            </td>
+          </tr>
+        </table>
 
        <br>
        <br>

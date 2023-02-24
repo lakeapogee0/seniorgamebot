@@ -31,10 +31,10 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 #creates an object for the database using above config
 db = SQLAlchemy(app)
 
-with db.session() as session:
-    results = session.execute("SELECT * FROM deathTable")
-    for row in results:
-        print(row)
+#with db.session() as session:
+ #   results = session.execute("SELECT * FROM deathTable")
+  #  for row in results:
+   #     print(row)
 
 
 #https://stackoverflow.com/questions/30785892/simple-select-statement-on-existing-table-with-sqlalchemy
@@ -45,15 +45,15 @@ with db.session() as session:
 class Assassin(db.Model):
 
     __tablename__ = "DeathTable"
-    __table_args__ = (
-        db.UniqueConstraint('murdered', 'witnessed'),)
+    #__table_args__ = (
+        #db.UniqueConstraint('murdered', 'witnessed'),)
         #UniqueConstraint('murdered', 'witnessed', name='unique_death'),
         #)#unique_death is just the name of the constraint which will be made in SQL (it just needs to call it something)
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), unique=True)
-    murdered = db.Column(db.Boolean, unique=True)
-    witnessed = db.Column(db.Boolean, unique=True)
-    timedout = db.Column(db.Boolean, unique = True)
+    murdered = db.Column(db.Boolean)
+    witnessed = db.Column(db.Boolean)
+    timedout = db.Column(db.Boolean)
 
     def set_murdered(self, value):
         if value:
@@ -110,16 +110,16 @@ callbackUrl = "https://api.groupme.com/v3/bots/post"
 
 
 
-game = GameState(gameState=0)
-try:
-    db.session.add(game)
-    db.session.commit()
-except IntegrityError as e:
-    db.session.rollback()
+#game = GameState(gameState=0)
+#try:
+#    db.session.add(game)
+ #   db.session.commit()
+#except IntegrityError as e:
+ #   db.session.rollback()
     # Handle the unique error
     # for example, you can show an error message to the user:
-    print('gameState - ERROR: Either was same, or NULL')
-    print(e)
+  #  print('gameState - ERROR: Either was same, or NULL')
+   # print(e)
 
 
 # GET requests will be blocked
@@ -197,7 +197,6 @@ def foo():
         if "✅" in request_data["text"]:
             #I asked chatGPT for clarification on how to set this up because I was getting confused by other sources.
             joinName = Assassin(name=request_data["name"], murdered=False, witnessed=False, timedout=False)
-            #print("testing the SQL" + request_data["name"] + " is out of the game!💀")
             try:
                 db.session.add(joinName)
                 db.session.commit()
