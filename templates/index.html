@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
     <body>
-      <h1>testing the index homepage</h1>
-      <img src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/shushing-face.png" alt="roblox">
+      <h1>homework assignment bot</h1>
+      <img src="https://s3.amazonaws.com/pix.iemoji.com/images/emoji/apple/ios-12/256/shushing-face.png" alt="shushface" style="width: 2in">
       <!-- chatGPT made this table-->
-        <table>
+<table>
           <tr>
             <th style="padding-right: 1in">Alive👤</th>
             <th style="padding-right: 1in">Murdered💀</th>
@@ -13,6 +13,8 @@
           </tr>
           <tr>
             <td style="padding-right: 1in">
+                Count: {{ none_list|count }}
+                <br>
               {% set none_list = [] %}
               {% for assassin in data %}
                 {% if not assassin.murdered and not assassin.witnessed and not assassin.timedout %}
@@ -22,9 +24,10 @@
               {% for item in none_list %}
                 {{ item }}<br>
               {% endfor %}
-              Count: {{ none_list|count }}
             </td>
             <td style="padding-right: 1in">
+                Count: {{ murdered_list|count }}
+                <br>
               {% set murdered_list = [] %}
               {% for assassin in data %}
                 {% if assassin.murdered %}
@@ -34,9 +37,10 @@
               {% for item in murdered_list %}
                 {{ item }}<br>
               {% endfor %}
-              Count: {{ murdered_list|count }}
             </td>
             <td style="padding-right: 1in">
+                Count: {{ witnessed_list|count }}
+                <br>
               {% set witnessed_list = [] %}
               {% for assassin in data %}
                 {% if assassin.witnessed %}
@@ -46,9 +50,10 @@
               {% for item in witnessed_list %}
                 {{ item }}<br>
               {% endfor %}
-              Count: {{ witnessed_list|count }}
             </td>
             <td style="padding-right: 1in">
+                Count: {{ timedout_list|count }}
+                <br>
               {% set timedout_list = [] %}
               {% for assassin in data %}
                 {% if assassin.timedout %}
@@ -58,10 +63,11 @@
               {% for item in timedout_list %}
                 {{ item }}<br>
               {% endfor %}
-              Count: {{ timedout_list|count }}
             </td>
           </tr>
         </table>
+
+
 
        <br>
        <br>
